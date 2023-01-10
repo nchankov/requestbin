@@ -45,7 +45,7 @@ if (isset($_GET['inspect'])) {
 	    </style>
 	  </head>
 	  <body>
-	  	<a href="?clear">Clear log</a>
+	  	<a href="?clear" onclick="return confirm('Are you sure?');">Clear log</a>
 	    <?php
 	    //echo '<pre>';
 	    print_r($contents);
