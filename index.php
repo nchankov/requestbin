@@ -5,11 +5,17 @@ $body = file_get_contents("php://input");
 
 $requestlog = 'requests.log';
 
+if (isset($_GET['clear'])) {
+	if (is_file($requestlog)) {
+		unlink($requestlog);
+	}
+	header('Location: ' . $_SERVER['SCRIPT_URI'] . '?inspect');
+	die();
+}
 $contents = '';
 if (is_file($requestlog)) {
 	$contents = file_get_contents($requestlog);
 }
-
 if (isset($_GET['inspect'])) {
 	?>
 	<!DOCTYPE html>
@@ -39,6 +45,7 @@ if (isset($_GET['inspect'])) {
 	    </style>
 	  </head>
 	  <body>
+	  	<a href="?clear">Clear log</a>
 	    <?php
 	    //echo '<pre>';
 	    print_r($contents);
