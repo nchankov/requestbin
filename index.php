@@ -42,10 +42,27 @@ if (isset($_GET['inspect'])) {
 	    	.boolean { color: blue; }
 	    	.null { color: magenta; }
 	    	.key { color: red; }
+	    	.clear-log {
+	    		position: fixed;
+	    		top: 10px;
+	    		right: 10px;
+	    		padding: 10px 15px;
+	    		background-color: #f00;
+	    		border: 1px solid #900;
+	    		text-decoration: none;
+	    		border-radius: 5px;
+	    		color: #333;
+	    		box-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+	    	}
+	    	.clear-log:active {
+	    		background-color: #d00;
+	    		color: #fff;
+	    		box-shadow: none;
+	    	}
 	    </style>
 	  </head>
 	  <body>
-	  	<a href="?clear" onclick="return confirm('Are you sure?');">Clear log</a>
+	  	<a href="?clear" class="clear-log" onclick="return confirm('Are you sure?');">Clear log</a>
 	    <?php
 	    //echo '<pre>';
 	    print_r($contents);
@@ -115,6 +132,19 @@ if ($_SERVER['REQUEST_METHOD'] != 'GET') {
 	$request .= "</div>";
 
 }
+//real url path
+$prefix = substr(dirname($_SERVER['SCRIPT_FILENAME']), strlen(dirname(__DIR__)));
+//fake path (rewrite url part)
+$fake_path = substr(parse_url($_SERVER['SCRIPT_URI'], PHP_URL_PATH), strlen($prefix)+1);
+
+$response = null;
+if (is_file(__DIR__ . '/' . $fake_path)) {
+	$response = file_get_contents(__DIR__ . '/' . $fake_path);
+	$request .= '<div class="body">';
+	$request .= "<h3>Response</h3>";
+	$request .= '<pre class="body">' . $response . '</pre>';
+	$request .= "</div>";
+}
 $request .= '</div>';
 
 
@@ -124,14 +154,9 @@ if (fwrite($fp, $request . $contents) === FALSE) {
 }
 fclose($fp);
 
-//real url path
-$prefix = substr(dirname($_SERVER['SCRIPT_FILENAME']), strlen(dirname(__DIR__)));
-//fake path (rewrite url part)
-$fake_path = substr(parse_url($_SERVER['SCRIPT_URI'], PHP_URL_PATH), strlen($prefix)+1);
-
-if (is_file(__DIR__ . '/' . $fake_path)) {
+if ($response) {
 	header('Content-Type: application/json');
-	echo file_get_contents(__DIR__ . '/' . $fake_path);
+	echo $response;
 } else {
 	echo 'ok';
 }
