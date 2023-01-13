@@ -18,7 +18,7 @@ https://server.com/requestbin/
 
 if you have a file named auth.json in the folder then if the url accessed is
 
-https://server.com/requestbin/auth.json the contents of this file would be returned instead of ok.
+https://server.com/requestbin/auth.json the contents of this file would be returned instead of 'ok'.
 
 ### Another example
 
