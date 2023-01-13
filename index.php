@@ -1,4 +1,3 @@
-
 <?php
 $headers = getallheaders();
 $body = file_get_contents("php://input");
@@ -12,6 +11,7 @@ if (isset($_GET['clear'])) {
 	header('Location: ' . $_SERVER['SCRIPT_URI'] . '?inspect');
 	die();
 }
+
 $contents = '';
 if (is_file($requestlog)) {
 	$contents = file_get_contents($requestlog);
@@ -124,4 +124,14 @@ if (fwrite($fp, $request . $contents) === FALSE) {
 }
 fclose($fp);
 
-echo 'ok';
+//real url path
+$prefix = substr(dirname($_SERVER['SCRIPT_FILENAME']), strlen(dirname(__DIR__)));
+//fake path (rewrite url part)
+$fake_path = substr(parse_url($_SERVER['SCRIPT_URI'], PHP_URL_PATH), strlen($prefix)+1);
+
+if (is_file(__DIR__ . '/' . $fake_path)) {
+	header('Content-Type: application/json');
+	echo file_get_contents(__DIR__ . '/' . $fake_path);
+} else {
+	echo 'ok';
+}
