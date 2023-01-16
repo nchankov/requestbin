@@ -122,7 +122,7 @@ if (!$fp = fopen($requestlog, 'w+')) {
      exit;
 }
 $request = '<div class="request">';
-$request .= '<h2>' . $_SERVER['REQUEST_METHOD'] . ' ' . date('Y-m-d H:i:s') . '</h2>';
+$request .= '<h2>' . $_SERVER['REQUEST_METHOD'] . ' to ' . $_SERVER['REQUEST_URI'] . ' ' . date('Y-m-d H:i:s') . '</h2>';
 $request .= "<h3>Headers</h3>";
 $request .= '<pre>'.print_r($headers, true).'</pre>';
 if ($_SERVER['REQUEST_METHOD'] != 'GET') {
