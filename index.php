@@ -4,6 +4,24 @@ $body = file_get_contents("php://input");
 
 $requestlog = 'requests.log';
 
+function format_headers($headers)
+{
+	$return = '<table class="headers">';
+	$return .= '<thead>';
+	$return .= '<tr><th>Key</th><th>Value</th></tr>';
+	$return .= '</thead>';
+	$return .= '<tbody>';
+	foreach ($headers as $key => $value) {
+		$return .= '<tr>';
+		$return .= '<td class="key">' . $key . '</td>';
+		$return .= '<td class="value highlight">' . $value . '</td>';
+		$return .= '</tr>';
+	}
+	$return .= '</tbody>';
+	$return .= '</table>';
+	return $return;
+}
+
 if (isset($_GET['clear'])) {
 	if (is_file($requestlog)) {
 		unlink($requestlog);
@@ -59,14 +77,34 @@ if (isset($_GET['inspect'])) {
 	    		color: #fff;
 	    		box-shadow: none;
 	    	}
+			table.headers {
+				width: 100%;
+			}
+			table.headers thead th {
+				border: 1px solid #efefef;
+				background: #efefef;
+				padding: 9px;
+			}
+			table.headers tbody td.key {
+				border: 1px solid #efefef;
+				background: #efefef;
+				padding: 9px;
+			}
+			table.headers tbody td.value {
+				border: 1px solid #efefef;
+				padding: 9px;
+			}
+			table.headers tbody {
+				overflow: auto;
+				max-height: 30px;
+			}
 	    </style>
 	  </head>
 	  <body>
 	  	<a href="?clear" class="clear-log" onclick="return confirm('Are you sure?');">Clear log</a>
 	    <?php
-	    //echo '<pre>';
 	    print_r($contents);
-	    //echo '</pre>';?>
+		?>
 	    <script>
 	    	function insertAfter(referenceNode, newNode) {
 		        referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
@@ -110,6 +148,16 @@ if (isset($_GET['inspect'])) {
 		    		}
 		    	});	
 	    	}
+
+			elements = document.querySelectorAll('.highlight');
+			for (var i = 0; i < elements.length; i++) {
+	    		elements[i].addEventListener('click', function() {
+					var range = document.createRange();
+			        range.selectNode(this);
+			        window.getSelection().removeAllRanges();
+					window.getSelection().addRange(range);
+				});
+			}
 	    </script>
 	  </body>
 	</html>
@@ -124,7 +172,7 @@ if (!$fp = fopen($requestlog, 'w+')) {
 $request = '<div class="request">';
 $request .= '<h2>' . $_SERVER['REQUEST_METHOD'] . ' to ' . $_SERVER['REQUEST_URI'] . ' ' . date('Y-m-d H:i:s') . '</h2>';
 $request .= "<h3>Headers</h3>";
-$request .= '<pre>'.print_r($headers, true).'</pre>';
+$request .= '<pre>'.format_headers($headers).'</pre>';
 if ($_SERVER['REQUEST_METHOD'] != 'GET') {
 	$request .= '<div class="body">';
 	$request .= "<h3>Body</h3>";
