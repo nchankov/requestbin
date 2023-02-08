@@ -81,8 +81,8 @@ if (isset($_GET['inspect'])) {
 				width: 100%;
 			}
 			table.headers thead th {
-				border: 1px solid #efefef;
-				background: #efefef;
+				border: 1px solid #ddd;
+				background: #ccc;
 				padding: 9px;
 			}
 			table.headers tbody td.key {
@@ -93,6 +93,8 @@ if (isset($_GET['inspect'])) {
 			table.headers tbody td.value {
 				border: 1px solid #efefef;
 				padding: 9px;
+				word-wrap: break-word;
+				width: 100%;
 			}
 			table.headers tbody {
 				overflow: auto;
