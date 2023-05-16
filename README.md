@@ -25,3 +25,8 @@ https://server.com/requestbin/auth.json the contents of this file would be retur
 if you have file like path/to/file.json in the folder then you can access it with 
 
 https://server.com/requestbin/path/to/file.json
+
+### Allow clearing the log
+
+create a file .env in the folder and use the .env.sample as example. Change your trusted ip and only visitors from that ip
+should be able to see and use the clear button which will clear the request log. It's useful if you want to keep your log file tidy.
