@@ -1,7 +1,6 @@
 <?php
 $headers = getallheaders();
 $body = file_get_contents("php://input");
-
 $requestlog = 'requests.log';
 
 function is_admin()
@@ -177,8 +176,14 @@ $request .= "<h3>Headers</h3>";
 $request .= '<pre>' . format_headers($headers) . '</pre>';
 if ($_SERVER['REQUEST_METHOD'] != 'GET') {
 	$request .= '<div class="body">';
-	$request .= "<h3>Body</h3>";
-	$request .= '<pre class="body">' . print_r($body, true) . '</pre>';
+	if ($body) {
+		$request .= "<h3>Body</h3>";
+		$request .= '<pre class="body">' . print_r($body, true) . '</pre>';
+	}
+	if ($_POST) {
+		$request .= "<h3>_POST</h3>";
+		$request .= '<pre class="body">' . print_r($_POST, true) . '</pre>';
+	}
 	$request .= "</div>";
 
 }
