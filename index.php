@@ -37,6 +37,17 @@ function format_headers($headers)
 	return $return;
 }
 
+if (isset($_GET['changed'])) {
+	if (is_file($requestlog)) {
+		header('Content-type: application/json');
+		header("Content-Disposition: inline; filename=ajax.json");
+		echo json_encode(['size' => filesize($requestlog)]);
+	} else {
+		echo json_encode(['size' => false]);
+	}
+	die();
+}
+
 if (isset($_GET['clear'])) {
 	if (is_admin() && is_file($requestlog)) {
 		unlink($requestlog);
@@ -56,6 +67,25 @@ if (isset($_GET['inspect'])) {
 
 	<head>
 		<meta charset="utf-8">
+		<script>
+			let size;
+			async function logJSONData() {
+				const response = await fetch("?changed");
+				const jsonData = await response.json();
+				if (typeof size == 'undefined') {
+					size = jsonData.size;
+				} else {
+					if (size != jsonData.size) {
+						console.log('new request came in!');
+						window.location.reload();
+					}
+				}
+			}
+			setInterval(function() {
+				
+				logJSONData();
+			}, 3000);
+		</script>
 		<style>
 			pre.body {
 				overflow-x: auto;
@@ -155,7 +185,8 @@ if (isset($_GET['inspect'])) {
 		<?php
 		print_r($contents);
 		?>
-		<script>			function insertAfter(referenceNode, newNode) { referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling); } function syntaxHighlight(json) { json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) { var cls = 'number'; if (/^"/.test(match)) { if (/:$/.test(match)) { cls = 'key'; } else { cls = 'string'; } } else if (/true|false/.test(match)) { cls = 'boolean'; } else if (/null/.test(match)) { cls = 'null'; } return '<span class="' + cls + '">' + match + '</span>'; }); }
+		<script>
+			function insertAfter(referenceNode, newNode) { referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling); }; function syntaxHighlight(json) { json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) { var cls = 'number'; if (/^"/.test(match)) { if (/:$/.test(match)) { cls = 'key'; } else { cls = 'string'; } } else if (/true|false/.test(match)) { cls = 'boolean'; } else if (/null/.test(match)) { cls = 'null'; } return '<span class="' + cls + '">' + match + '</span>'; }); }
 			elements = document.querySelectorAll('pre.body'); for (var i = 0; i < elements.length; i++) { elements[i].addEventListener('click', function () { var range = document.createRange(); range.selectNode(this); window.getSelection().removeAllRanges(); if (typeof this.dataset.clicked == 'undefined' || this.dataset.clicked == 0) { window.getSelection().addRange(range); json = JSON.parse(this.innerHTML); var str = JSON.stringify(json, undefined, 4); var parsedBody = document.createElement('pre'); parsedBody.innerHTML = syntaxHighlight(str); insertAfter(this, parsedBody); this.dataset.clicked = 1; } else { this.dataset.clicked = 0; this.parentNode.removeChild(this.nextElementSibling); } }); }
 			elements = document.querySelectorAll('.highlight'); for (var i = 0; i < elements.length; i++) { elements[i].addEventListener('click', function () { var range = document.createRange(); range.selectNode(this); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); }); }
 		</script>
