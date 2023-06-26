@@ -37,6 +37,7 @@ function format_headers($headers)
 	return $return;
 }
 
+//check if new data arrived
 if (isset($_GET['changed'])) {
 	if (is_file($requestlog)) {
 		header('Content-type: application/json');
@@ -48,6 +49,7 @@ if (isset($_GET['changed'])) {
 	die();
 }
 
+//clear the log
 if (isset($_GET['clear'])) {
 	if (is_admin() && is_file($requestlog)) {
 		unlink($requestlog);
